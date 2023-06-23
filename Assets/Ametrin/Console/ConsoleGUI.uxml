@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/ConsoleDefaultStyle.uss?fileID=7433441132597879392&amp;guid=97ea13362e0f4d844b5c20dbc8e1434b&amp;type=3#ConsoleDefaultStyle" />
+    <ui:VisualElement style="position: absolute; bottom: 0; top: auto; left: 0; right: 0;">
+        <ui:ListView />
+        <ui:TextField placeholder-text=". . ." picking-mode="Ignore" name="Input" style="border-top-left-radius: 15px; border-bottom-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px;" />
+    </ui:VisualElement>
+</ui:UXML>
