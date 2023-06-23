@@ -1,7 +1,0 @@
-.unity-text-field__input {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.unity-text-element--inner-input-field-component {
-    color: rgb(255, 255, 255);
-}

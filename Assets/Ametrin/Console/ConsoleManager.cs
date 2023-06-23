@@ -1,16 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using AmetrinStudios.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Ametrin.Console{
-    public class ConsoleManager : MonoBehaviour{
+    public sealed class ConsoleManager : MonoBehaviour{
         public static ConsoleManager Instance {get; private set;}
         private static VisualElement ConsoleElement;
         private static TextField InputElement;
+        private static Label MessageDisplayElement;
+        private static IConsoleHandler DefaultHandler = new ConsoleMessageHandler(AddMessage, true);
         private readonly static Dictionary<char, IConsoleHandler> Handlers = new();
+        private readonly static List<string> Messages = new();
         private void Awake(){
             if(Instance != null && Instance != this){
                 DestroyImmediate(gameObject);
@@ -22,6 +24,8 @@ namespace Ametrin.Console{
             InputElement = ConsoleElement.Query<TextField>();
             InputElement.RegisterValueChangedCallback((value) => OnInputChanged(value.newValue));
             InputElement.RegisterCallback<KeyUpEvent>((key) => {if(key.keyCode is KeyCode.Return or KeyCode.KeypadEnter) Enter();});
+            MessageDisplayElement = ConsoleElement.Query<Label>();
+            Messages.Clear();
         }
 
         private static void OnInputChanged(string value){
@@ -32,8 +36,7 @@ namespace Ametrin.Console{
             var value = InputElement.value;
             InputElement.value = "";
             if(!GetHandler(value).TryGet(out var handler)){
-                Debug.Log(value);
-                return;
+                handler = DefaultHandler;
             }
 
             if(!handler.PassPrefix){
@@ -60,28 +63,44 @@ namespace Ametrin.Console{
             Handlers.Add(prefix, handler);
         }
 
+        public static void OverrideDefaultHandler(IConsoleHandler handler){
+            DefaultHandler = handler;
+        }
+
+        public static void AddMessage(string message){
+            Messages.Add(message);
+            UpdateView();
+        }
+        
+        public static void AddErrorMessage(string message){
+            AddMessage($"<color=red>{message}</color>");
+        }
+
         public static void Hide() => Instance.gameObject.SetActive(false);
         public static void Show() => Instance.gameObject.SetActive(true);
+
+        private static void UpdateView(){
+            MessageDisplayElement.text = string.Join("\n", Messages);
+        }
     }
 
 #nullable enable
-    public sealed class ConsoleHandler : IConsoleHandler{
+    public sealed class ConsoleMessageHandler : IConsoleHandler{
         public bool PassPrefix { get; set; }
-        private readonly Func<string, string?> OnExecute;
-        public ConsoleHandler(Func<string, string?> execute, bool passPrefix = false){
+        private readonly Action<string> OnExecute;
+        public ConsoleMessageHandler(Action<string> execute, bool passPrefix = false){
             OnExecute = execute;
             PassPrefix = passPrefix;
         }
 
-        public string? Execute(string value){
-            return OnExecute(value);
+        public void Execute(string value){
+            OnExecute(value);
         }
     }
 
     public interface IConsoleHandler{
         public bool PassPrefix {get;}
-
-        public string? Execute(string value); 
+        public void Execute(string value); 
         public string? GetSyntax(string value) => null;
     }
 }

@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Ametrin/Console/ConsoleDefaultStyle.uss?fileID=7433441132597879392&amp;guid=97ea13362e0f4d844b5c20dbc8e1434b&amp;type=3#ConsoleDefaultStyle" />
+    <ui:VisualElement name="console" style="position: absolute; bottom: 0; top: auto; left: 0; right: 0;">
+        <ui:Label name="display" display-tooltip-when-elided="true" select-line-by-triple-click="true" select-word-by-double-click="true" selectable="true" text="Lol" class="ametrin-console-text ametrin-console-background" />
+        <ui:TextField placeholder-text=". . ." picking-mode="Ignore" name="input" class="ametrin-console-text" style="border-top-left-radius: 15px; border-bottom-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px;" />
+    </ui:VisualElement>
+</ui:UXML>

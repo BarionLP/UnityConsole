@@ -41,10 +41,12 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Ametrin\Console\ConsoleManager.cs" />
-     <Compile Include="Assets\Command.cs" />
+     <Compile Include="Assets\Ametrin\AutoRegistry\ScriptableObjectRegistry.cs" />
+     <Compile Include="Assets\Ametrin\Console\Command\Command.cs" />
      <Compile Include="Assets\Ametrin\Utils\Result.cs" />
-     <None Include="Assets\Ametrin\Console\ConsoleDefaultStyle.uss" />
-     <None Include="Assets\Ametrin\Console\ConsoleGUI.uxml" />
+     <Compile Include="Assets\Ametrin\Console\Command\ConsoleCommandHandler.cs" />
+     <None Include="Assets\Ametrin\Console\GUI\ConsoleDefaultStyle.uss" />
+     <None Include="Assets\Ametrin\Console\GUI\ConsoleGUI.uxml" />
     <Reference Include="UnityEngine">
         <HintPath>C:\Program Files\Unity\Hub\Editor\2023.1.1f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
