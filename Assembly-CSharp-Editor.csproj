@@ -40,7 +40,7 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2023.1.1f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Ametrin\Console\Command\Editor\CommandArgumentPropertyDrawer.cs" />
+     <Compile Include="Assets\Ametrin\Console\Command\Editor\CommandArgumentConfigPropertyDrawer.cs" />
      <Compile Include="Assets\Ametrin\Console\Command\Editor\CommandEditor.cs" />
      <None Include="Assets\Ametrin\Console\Command\Editor\CommandEditorGUI.uxml" />
     <Reference Include="UnityEngine">

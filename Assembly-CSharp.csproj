@@ -41,8 +41,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Ametrin\Console\ConsoleManager.cs" />
-     <Compile Include="Assets\Ametrin\AutoRegistry\ScriptableObjectRegistry.cs" />
-     <Compile Include="Assets\Ametrin\Console\Command\Command.cs" />
+     <Compile Include="Assets\Test\TestCommands.cs" />
      <Compile Include="Assets\Ametrin\Utils\Result.cs" />
      <Compile Include="Assets\Ametrin\Console\Command\ConsoleCommandHandler.cs" />
      <None Include="Assets\Ametrin\Console\GUI\ConsoleDefaultStyle.uss" />
