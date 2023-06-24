@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Ametrin.Console.Command{
     public sealed class ConsoleCommandHandler : MonoBehaviour, IConsoleHandler {
-        private static readonly Dictionary<string, CommandMethodInfo> commands = new();
+        private static readonly Dictionary<string, MethodInfo> commands = new();
         private static readonly Dictionary<Type, Func<string, object>> argumentParsers = new();
         public bool PassPrefix => false;
 
@@ -26,8 +26,7 @@ namespace Ametrin.Console.Command{
                 if (attribute is null) continue;
                 
                 var commandName = attribute.Name ?? method.Name.ToLower();
-                var isAsync = method.ReturnType == typeof(Task);
-                commands[commandName] = new CommandMethodInfo(method, isAsync);
+                commands[commandName] = method;
             }
         }
 
@@ -36,13 +35,11 @@ namespace Ametrin.Console.Command{
             if (inputParts.Length == 0) return;
 
             var commandName = inputParts[0];
-            if (!commands.TryGetValue(commandName, out var commandMethod)){
+            if (!commands.TryGetValue(commandName, out var method)){
                 ConsoleManager.AddErrorMessage("Command not found: " + commandName);
                 return;
             }
 
-            var method = commandMethod.Method;
-            var isAsync = commandMethod.IsAsync;
             var parameters = method.GetParameters();
             var args = new object[parameters.Length];
 
@@ -68,13 +65,6 @@ namespace Ametrin.Console.Command{
                 args[i] = arg;
             }
 
-            // if (isAsync){
-            //     _ = (Task) method.Invoke(instance, args);
-            // }
-            // else{
-            //     method.Invoke(instance, args);
-            // }
-
             method.Invoke(null, args);
         }
 
@@ -86,16 +76,6 @@ namespace Ametrin.Console.Command{
                 return Convert.ChangeType(argValue, targetType);
             }catch{
                 return null;
-            }
-        }
-
-        private sealed class CommandMethodInfo{
-            public MethodInfo Method { get; }
-            public bool IsAsync { get; }
-
-            public CommandMethodInfo(MethodInfo method, bool isAsync){
-                Method = method;
-                IsAsync = isAsync;
             }
         }
     }
