@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AmetrinStudios.Utils{
+namespace Ametrin.Utils{
     #nullable enable
     public sealed class Result<T>{
         public readonly ResultStatus Status = ResultStatus.Failed;

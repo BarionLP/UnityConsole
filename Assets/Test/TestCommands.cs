@@ -6,17 +6,18 @@ using UnityEngine;
 public sealed class TestCommands : MonoBehaviour{
 
     static TestCommands(){
-        ConsoleCommandHandler.RegisterCommands<TestCommands>();
+        ConsoleManager.RegisterHandler('/', new ConsoleCommandHandler());
+        CommandManager.RegisterCommands<TestCommands>();
     }
 
     [Command("add")]
-    public static void Add(int a, int b){
-        ConsoleManager.AddMessage($"{a} + {b} is {a+b}");
+    public static void Add(int left, int right){
+        ConsoleManager.AddMessage($"{left} + {right} is {left+right}");
     }
     
-    [Command("test")]
+    [Command("wait")]
     public static async Task Test(float seconds){
         await Task.Delay((int)(seconds*1000));
-        ConsoleManager.AddMessage($"Waited for {seconds:2F}s");
+        ConsoleManager.AddMessage($"Waited for {seconds}s");
     }
 }

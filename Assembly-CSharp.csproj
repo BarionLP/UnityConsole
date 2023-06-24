@@ -40,7 +40,14 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2023.1.1f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Ametrin\AutoRegistry\IAutoRegistry.cs" />
+     <Compile Include="Assets\Ametrin\AutoRegistry\ScriptableObjectRegistry.cs" />
      <Compile Include="Assets\Test\TestCommands.cs" />
+     <Compile Include="Assets\Ametrin\AutoRegistry\IRegistry.cs" />
+     <Compile Include="Assets\Ametrin\Console\Command\IComandArgumentParser.cs" />
+     <Compile Include="Assets\Test\Item.cs" />
+     <Compile Include="Assets\Ametrin\AutoRegistry\MutableScriptableObjectRegistry.cs" />
+     <Compile Include="Assets\Ametrin\Console\Command\CommandManager.cs" />
      <Compile Include="Assets\Ametrin\Utils\Result.cs" />
      <Compile Include="Assets\Ametrin\Console\Command\ConsoleCommandHandler.cs" />
      <Compile Include="Assets\Ametrin\Console\Scripts\ConsoleManager.cs" />

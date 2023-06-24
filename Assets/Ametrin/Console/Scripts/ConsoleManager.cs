@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using AmetrinStudios.Utils;
+using Ametrin.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,10 +9,12 @@ namespace Ametrin.Console{
         public static ConsoleManager Instance {get; private set;}
         private static VisualElement ConsoleElement;
         private static TextField InputElement;
+        private static Label SyntaxHintLabel;
         private static Label MessageDisplayElement;
         private static IConsoleHandler DefaultHandler = new ConsoleMessageHandler(AddMessage, true);
         private readonly static Dictionary<char, IConsoleHandler> Handlers = new();
         private readonly static List<string> Messages = new();
+        private static KeyValuePair<char, IConsoleHandler> CachedHandler;
         private void Awake(){
             if(Instance != null && Instance != this){
                 DestroyImmediate(gameObject);
@@ -24,39 +26,55 @@ namespace Ametrin.Console{
             InputElement = ConsoleElement.Query<TextField>();
             InputElement.RegisterValueChangedCallback((value) => OnInputChanged(value.newValue));
             InputElement.RegisterCallback<KeyUpEvent>((key) => {if(key.keyCode is KeyCode.Return or KeyCode.KeypadEnter) Enter();});
-            MessageDisplayElement = ConsoleElement.Query<Label>();
+            MessageDisplayElement = ConsoleElement.Query<Label>("output");
+            SyntaxHintLabel = ConsoleElement.Query<Label>("syntax");
             Messages.Clear();
         }
 
-        private static void OnInputChanged(string value){
+        private static void OnInputChanged(string input){
+            var handler = GetHandler(input);
+            if (!handler.PassPrefix){
+                input = input.Remove(0, 1);
+            }
+            var syntax = handler.GetSyntax(input);
 
+            if(syntax is null){
+                SyntaxHintLabel.visible = false;
+                return;
+            }
+            SyntaxHintLabel.text = syntax;
+            SyntaxHintLabel.visible = true;
         }
 
         private static void Enter(){
-            var value = InputElement.value;
+            var input = InputElement.value;
             InputElement.value = "";
-            if(!GetHandler(value).TryGet(out var handler)){
-                handler = DefaultHandler;
-            }
+            var handler = GetHandler(input);
 
             if(!handler.PassPrefix){
-                value = value.Remove(0, 1);
+                input = input.Remove(0, 1);
             }
 
-            handler.Execute(value);
+            handler.Execute(input);
         }
 
-        private static Result<IConsoleHandler> GetHandler(string input){            
+        private static IConsoleHandler GetHandler(string input){
+            if (CachedHandler.Value != null && input.StartsWith(CachedHandler.Key)){
+                return CachedHandler.Value;
+            }
+
             foreach(var handler in Handlers){
                 if(input.StartsWith(handler.Key)){
-                    return Result<IConsoleHandler>.Succeeded(handler.Value);
+                    CachedHandler = handler;
+                    return handler.Value;
                 }
             }
-
-            return ResultStatus.ValueDoesNotExist;
+            
+            CachedHandler = default;
+            return DefaultHandler;
         }
 
-        public static void RegisterHandler(char prefix, IConsoleHandler handler){
+        public static void RegisterHandler(char prefix, IConsoleHandler handler){            
             if(Handlers.ContainsKey(prefix)){
                 throw new ArgumentException($"console handler prefix '{prefix}' already exists", nameof(prefix));
             }

@@ -20,3 +20,9 @@
 .unity-base-text-field__input {
     background-color: rgba(0, 0, 0, 0.5);
 }
+
+.ametrin-console-suggestion {
+    color: rgb(118, 118, 118);
+    font-size: 24px;
+    -unity-font-style: italic;
+}
