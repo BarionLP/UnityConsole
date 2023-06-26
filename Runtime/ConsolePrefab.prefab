@@ -45,6 +45,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e58930cbedfc9a8409a9622a86428da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ToggleInput:
+    m_Name: Toggle Input
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 99010720-866a-49a8-9c7b-c973b33a0248
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: f650d73f-8a7a-4c57-9269-d5e5b3a547c1
+      m_Path: <Keyboard>/t
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Toggle Input
+      m_Flags: 0
+    m_Flags: 0
 --- !u!114 &7231190985814236452
 MonoBehaviour:
   m_ObjectHideFlags: 0
