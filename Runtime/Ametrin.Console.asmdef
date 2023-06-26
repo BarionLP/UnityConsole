@@ -1,3 +1,14 @@
 {
-	"name": "Ametrin.Console"
+    "name": "Ametrin.Console",
+    "rootNamespace": "Ametrin.Console",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
