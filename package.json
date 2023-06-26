@@ -1,7 +1,7 @@
 {
     "name": "com.ametrin.unity-console",
     "displayName": "Ametrin Unity Console",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "unity": "2022.2",
     "description": "Runtime Console for Unity",
     "license": "MIT",
