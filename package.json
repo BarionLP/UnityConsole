@@ -1,0 +1,20 @@
+{
+    "name": "com.ametrin.unity-console",
+    "displayName": "Ametrin Unity Console",
+    "version": "0.1.0",
+    "unity": "2022.2",
+    "description": "Runtime Console for Unity",
+    "license": "MIT",
+    "author": {
+        "name": "Barion",
+        "email": "ametrin.studios@gmail.com",
+        "url": "https://github.com/BarionLP"
+    },
+    "bugs": {
+        "url": "https://github.com/BarionLP/UnityConsole/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/BarionLP/UnityConsole.git"
+    }
+}
