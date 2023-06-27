@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.InputSystem;
 
 namespace Ametrin.Console{
     public sealed class ConsoleManager : MonoBehaviour{
         public static ConsoleManager Instance {get; private set;}
+        private static UIDocument Document;
         private static VisualElement ConsoleElement;
         private static TextField InputElement;
         private static Label SyntaxHintLabel;
@@ -14,6 +16,10 @@ namespace Ametrin.Console{
         private readonly static Dictionary<char, IConsoleHandler> Handlers = new();
         private readonly static List<string> Messages = new();
         private static KeyValuePair<char, IConsoleHandler> CachedHandler;
+        
+        [SerializeField] private InputAction ShowInput;
+        [SerializeField] private InputAction HideInput;
+        
         private void Awake(){
             if(Instance != null && Instance != this){
                 DestroyImmediate(gameObject);
@@ -21,13 +27,22 @@ namespace Ametrin.Console{
             }
 
             Instance = this;
-            ConsoleElement = GetComponent<UIDocument>().rootVisualElement;
+
+            Document = GetComponent<UIDocument>();
+            ConsoleElement = Document.rootVisualElement;
+            
             InputElement = ConsoleElement.Query<TextField>();
             InputElement.RegisterValueChangedCallback((value) => OnInputChanged(value.newValue));
             InputElement.RegisterCallback<KeyUpEvent>((key) => {if(key.keyCode is KeyCode.Return or KeyCode.KeypadEnter) Enter();});
+            
             MessageDisplayElement = ConsoleElement.Query<Label>("output");
             SyntaxHintLabel = ConsoleElement.Query<Label>("syntax");
+            SyntaxHintLabel.style.display = DisplayStyle.None;
+
             Messages.Clear();
+            ShowInput.performed += (_)=> Show();
+            HideInput.performed += (_)=> Hide();
+            Hide();
         }
 
         private static void OnInputChanged(string input){
@@ -38,11 +53,11 @@ namespace Ametrin.Console{
             var syntax = handler.GetSyntax(input);
 
             if(syntax is null){
-                SyntaxHintLabel.visible = false;
+                SyntaxHintLabel.style.display = DisplayStyle.None;
                 return;
             }
             SyntaxHintLabel.text = syntax;
-            SyntaxHintLabel.visible = true;
+            SyntaxHintLabel.style.display = DisplayStyle.Flex;
         }
 
         private static void Enter(){
@@ -55,6 +70,7 @@ namespace Ametrin.Console{
             }
 
             handler.Execute(input);
+            Debug.Log(input);
         }
 
         private static IConsoleHandler GetHandler(string input){
@@ -93,8 +109,17 @@ namespace Ametrin.Console{
             AddMessage($"<color=red>{message}</color>");
         }
 
-        public static void Hide() => Instance.gameObject.SetActive(false);
-        public static void Show() => Instance.gameObject.SetActive(true);
+        public static void Hide(){
+            Instance.HideInput.Disable();
+            ConsoleElement.style.visibility = Visibility.Hidden;
+            Instance.ShowInput.Enable();
+        }
+        public static void Show(){
+            Instance.ShowInput.Disable();
+            ConsoleElement.style.visibility = Visibility.Visible;
+            Instance.HideInput.Enable();
+
+        }
 
         private static void UpdateView(){
             MessageDisplayElement.text = string.Join("\n", Messages);
