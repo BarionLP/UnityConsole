@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4495812116716926086}
+  - component: {fileID: 7231190985814236452}
   - component: {fileID: 634710825341159033}
   - component: {fileID: 7107986456737707021}
-  - component: {fileID: 7231190985814236452}
   m_Layer: 0
   m_Name: ConsolePrefab
   m_TagString: Untagged
@@ -34,6 +34,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7231190985814236452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1487397213848430316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: ba492af8e9288a74b9cf57c44529fcc0, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 7e86dfebd36d04446b39352229289bd8, type: 3}
+  m_SortingOrder: 0
 --- !u!114 &634710825341159033
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53,7 +69,15 @@ MonoBehaviour:
     m_Id: ef29131f-357b-4d3c-907f-2da316f8a287
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 1cf389b6-d105-4e9a-898b-665e1d2918ed
+      m_Path: <Keyboard>/f1
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Show Input
+      m_Flags: 0
     m_Flags: 0
   HideInput:
     m_Name: Hide Input
@@ -62,7 +86,15 @@ MonoBehaviour:
     m_Id: e0733e6d-8648-4826-86f4-1d9b2bb335a8
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 0b1b3885-8967-4a84-b691-d5865c01a307
+      m_Path: <Keyboard>/f1
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Hide Input
+      m_Flags: 0
     m_Flags: 0
 --- !u!114 &7107986456737707021
 MonoBehaviour:
@@ -77,19 +109,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LogLevel: 2
---- !u!114 &7231190985814236452
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1487397213848430316}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_PanelSettings: {fileID: 11400000, guid: ba492af8e9288a74b9cf57c44529fcc0, type: 2}
-  m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: 7e86dfebd36d04446b39352229289bd8, type: 3}
-  m_SortingOrder: 0
