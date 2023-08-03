@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace Ametrin.Console{
     public sealed class ConsoleManager : MonoBehaviour{
-        public static ConsoleManager Instance {get; private set;}
+        private static ConsoleManager Instance {get; set;}
         private static UIDocument Document;
         private static VisualElement ConsoleElement;
         private static TextField InputElement;
@@ -38,11 +38,15 @@ namespace Ametrin.Console{
             MessageDisplayElement = ConsoleElement.Query<Label>("output");
             SyntaxHintLabel = ConsoleElement.Query<Label>("syntax");
             SyntaxHintLabel.style.display = DisplayStyle.None;
+            Hide();
 
             Messages.Clear();
-            ShowInput.performed += (_)=> Show();
-            HideInput.performed += (_)=> Hide();
-            Hide();
+            ShowInput.performed += Show;
+            HideInput.performed += Hide;
+        }
+
+        private void OnEnable(){
+            ShowInput.Enable();
         }
 
         private static void OnInputChanged(string input){
@@ -70,7 +74,6 @@ namespace Ametrin.Console{
             }
 
             handler.Execute(input);
-            Debug.Log(input);
         }
 
         private static IConsoleHandler GetHandler(string input){
@@ -104,17 +107,23 @@ namespace Ametrin.Console{
             Messages.Add(message);
             UpdateView();
         }
-        
+        public static void AddWarningMessage(string message){
+            AddMessage($"<color=yellow>{message}</color>");
+        }
         public static void AddErrorMessage(string message){
             AddMessage($"<color=red>{message}</color>");
         }
+        public static void AddExceptionMessage(string message){
+            AddMessage($"<color=#cc0000ff>{message}</color>");
+        }
+        
 
-        public static void Hide(){
+        public static void Hide(InputAction.CallbackContext context = default){
             Instance.HideInput.Disable();
             ConsoleElement.style.visibility = Visibility.Hidden;
             Instance.ShowInput.Enable();
         }
-        public static void Show(){
+        public static void Show(InputAction.CallbackContext context = default){
             Instance.ShowInput.Disable();
             ConsoleElement.style.visibility = Visibility.Visible;
             Instance.HideInput.Enable();
@@ -124,9 +133,13 @@ namespace Ametrin.Console{
         private static void UpdateView(){
             MessageDisplayElement.text = string.Join("\n", Messages);
         }
+
+        private void OnDisable(){
+            ShowInput.Disable();
+        }
     }
 
-#nullable enable
+    #nullable enable
     public sealed class ConsoleMessageHandler : IConsoleHandler{
         public bool PassPrefix { get; set; }
         private readonly Action<string> OnExecute;
