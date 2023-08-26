@@ -4,7 +4,7 @@
 }
 
 .ametrin-console-background {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.75);
     border-top-left-radius: 15px;
     border-bottom-left-radius: 15px;
     border-top-right-radius: 15px;
@@ -18,7 +18,7 @@
 }
 
 .unity-base-text-field__input {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.75);
 }
 
 .ametrin-console-suggestion {

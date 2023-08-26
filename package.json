@@ -1,12 +1,12 @@
 {
     "name": "com.ametrin.unity-console",
     "displayName": "Ametrin Unity Console",
-    "version": "0.1.5",
+    "version": "0.1.7",
     "unity": "2022.3",
     "description": "Runtime Console for Unity",
     "license": "MIT",
     "dependencies": {
-        "com.unity.inputsystem": "1.6.3"
+        "com.unity.inputsystem": "1.7.0"
     },
     "author": {
         "name": "Barion",

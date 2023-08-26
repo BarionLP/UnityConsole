@@ -33,7 +33,7 @@ namespace Ametrin.Console{
             
             InputElement = ConsoleElement.Query<TextField>();
             InputElement.RegisterValueChangedCallback((value) => OnInputChanged(value.newValue));
-            InputElement.RegisterCallback<KeyUpEvent>((key) => {if(key.keyCode is KeyCode.Return or KeyCode.KeypadEnter) Enter();});
+            InputElement.RegisterCallback<KeyDownEvent>(HandleKeys);
             
             MessageDisplayElement = ConsoleElement.Query<Label>("output");
             SyntaxHintLabel = ConsoleElement.Query<Label>("syntax");
@@ -60,8 +60,8 @@ namespace Ametrin.Console{
                 SyntaxHintLabel.style.display = DisplayStyle.None;
                 return;
             }
-            SyntaxHintLabel.text = syntax;
             SyntaxHintLabel.style.display = DisplayStyle.Flex;
+            SyntaxHintLabel.text = syntax;
         }
 
         private static void Enter(){
@@ -74,6 +74,29 @@ namespace Ametrin.Console{
             }
 
             handler.Execute(input);
+        }
+
+        private static void Tab(){
+            var input = InputElement.value;
+            var handler = GetHandler(input);
+            if (!handler.PassPrefix){
+                input = input.Remove(0, 1);
+            }
+            var completion = handler.GetCompletion(input);
+            if(completion is null) return;
+            InputElement.value += completion;
+            InputElement.SelectRange(InputElement.value.Length, InputElement.value.Length);
+        }
+
+        private static void HandleKeys(KeyDownEvent upEvent){
+            if (upEvent.keyCode is KeyCode.Return or KeyCode.KeypadEnter){
+                Enter();
+                upEvent.PreventDefault();
+            }
+            if (upEvent.keyCode is KeyCode.Tab){
+                Tab();
+                upEvent.PreventDefault();
+            }
         }
 
         private static IConsoleHandler GetHandler(string input){
@@ -116,7 +139,6 @@ namespace Ametrin.Console{
         public static void AddExceptionMessage(string message){
             AddMessage($"<color=#cc0000ff>{message}</color>");
         }
-        
 
         public static void Hide(InputAction.CallbackContext context = default){
             Instance.HideInput.Disable();
@@ -126,8 +148,9 @@ namespace Ametrin.Console{
         public static void Show(InputAction.CallbackContext context = default){
             Instance.ShowInput.Disable();
             ConsoleElement.style.visibility = Visibility.Visible;
+            InputElement.Focus();
+            InputElement.SelectRange(InputElement.value.Length, InputElement.value.Length);
             Instance.HideInput.Enable();
-
         }
 
         private static void UpdateView(){
@@ -157,5 +180,6 @@ namespace Ametrin.Console{
         public bool PassPrefix {get;}
         public void Execute(string value); 
         public string? GetSyntax(string value) => null;
+        public string? GetCompletion(string value) => null;
     }
 }
