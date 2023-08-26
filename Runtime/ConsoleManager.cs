@@ -41,8 +41,8 @@ namespace Ametrin.Console{
             Hide();
 
             Messages.Clear();
-            ShowInput.performed += Show;
-            HideInput.performed += Hide;
+            ShowInput.canceled += Show;
+            HideInput.canceled += Hide;
         }
 
         private void OnEnable(){
