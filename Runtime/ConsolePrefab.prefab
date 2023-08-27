@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7231190985814236452}
   - component: {fileID: 634710825341159033}
   - component: {fileID: 7107986456737707021}
+  - component: {fileID: 1721124373060976944}
   m_Layer: 0
   m_Name: ConsolePrefab
   m_TagString: Untagged
@@ -62,40 +63,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e58930cbedfc9a8409a9622a86428da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowInput:
-    m_Name: Show Input
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: ef29131f-357b-4d3c-907f-2da316f8a287
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: 1cf389b6-d105-4e9a-898b-665e1d2918ed
-      m_Path: <Keyboard>/f1
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Show Input
-      m_Flags: 0
-    m_Flags: 0
-  HideInput:
-    m_Name: Hide Input
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: e0733e6d-8648-4826-86f4-1d9b2bb335a8
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings:
-    - m_Name: 
-      m_Id: 0b1b3885-8967-4a84-b691-d5865c01a307
-      m_Path: <Keyboard>/f1
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Hide Input
-      m_Flags: 0
-    m_Flags: 0
 --- !u!114 &7107986456737707021
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,3 +76,49 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LogLevel: 2
+--- !u!114 &1721124373060976944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1487397213848430316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef97667abc8e37148a620103ee7d2bb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Show:
+    m_Name: Show
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 70bec3f3-9dbe-43a1-b1f0-863f28ed61b2
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 31cd94cd-5244-4110-b5fa-cf1136af0788
+      m_Path: <Keyboard>/f1
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Show
+      m_Flags: 0
+    m_Flags: 0
+  Hide:
+    m_Name: Hide
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: ed269c13-a900-4bdb-a6b3-f90a74195e06
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 76a575f9-0fdd-46bb-bd2b-7310a3274217
+      m_Path: <Keyboard>/f1
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Hide
+      m_Flags: 0
+    m_Flags: 0

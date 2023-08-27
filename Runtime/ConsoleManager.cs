@@ -6,6 +6,10 @@ using UnityEngine.InputSystem;
 
 namespace Ametrin.Console{
     public sealed class ConsoleManager : MonoBehaviour{
+        public static event Action OnShow;
+        public static event Action OnHide;
+        public static bool IsVisible => ConsoleElement.style.visibility.value == Visibility.Visible;
+
         private static ConsoleManager Instance {get; set;}
         private static UIDocument Document;
         private static VisualElement ConsoleElement;
@@ -15,10 +19,6 @@ namespace Ametrin.Console{
         private static IConsoleHandler DefaultHandler = new ConsoleMessageHandler(AddMessage, true);
         private readonly static Dictionary<char, IConsoleHandler> Handlers = new();
         private readonly static List<string> Messages = new();
-        private static KeyValuePair<char, IConsoleHandler> CachedHandler;
-        
-        [SerializeField] private InputAction ShowInput;
-        [SerializeField] private InputAction HideInput;
         
         private void Awake(){
             if(Instance != null && Instance != this){
@@ -30,9 +30,9 @@ namespace Ametrin.Console{
 
             Document = GetComponent<UIDocument>();
             ConsoleElement = Document.rootVisualElement;
-            
+
             InputElement = ConsoleElement.Query<TextField>();
-            InputElement.RegisterValueChangedCallback((value) => OnInputChanged(value.newValue));
+            InputElement.RegisterValueChangedCallback(OnInputChanged);
             InputElement.RegisterCallback<KeyDownEvent>(HandleKeys);
             
             MessageDisplayElement = ConsoleElement.Query<Label>("output");
@@ -41,94 +41,87 @@ namespace Ametrin.Console{
             Hide();
 
             Messages.Clear();
-            ShowInput.canceled += Show;
-            HideInput.canceled += Hide;
         }
 
-        private void OnEnable(){
-            ShowInput.Enable();
-        }
-
-        private static void OnInputChanged(string input){
-            var handler = GetHandler(input);
-            if (!handler.PassPrefix){
-                input = input.Remove(0, 1);
-            }
-            var syntax = handler.GetSyntax(input);
-
-            if(syntax is null){
+        private void OnInputChanged(ChangeEvent<string> changeEvent){
+            var input = ReadInput();
+            if (input.IsEmpty){
                 SyntaxHintLabel.style.display = DisplayStyle.None;
                 return;
             }
-            SyntaxHintLabel.style.display = DisplayStyle.Flex;
-            SyntaxHintLabel.text = syntax;
-        }
-
-        private static void Enter(){
-            var input = InputElement.value;
-            InputElement.value = "";
             var handler = GetHandler(input);
-
-            if(!handler.PassPrefix){
-                input = input.Remove(0, 1);
-            }
-
-            handler.Execute(input);
+            UpdateSyntaxHint(input, handler);
         }
-
-        private static void Tab(){
-            var input = InputElement.value.TrimEnd();
-            var handler = GetHandler(input);
-            if (!handler.PassPrefix){
-                input = input.Remove(0, 1);
-            }
-            var completion = handler.GetCompletion(input);
-            if(completion is null) return;
-            InputElement.value = input + completion;
-            InputElement.SelectRange(InputElement.value.Length, InputElement.value.Length);
-        }
-
         private static void HandleKeys(KeyDownEvent upEvent){
-            if (upEvent.keyCode is KeyCode.Return or KeyCode.KeypadEnter){
-                Enter();
+            var input = ReadInput();
+            if (input.IsEmpty) return;
+            var handler = GetHandler(input);
+            if(upEvent.keyCode is KeyCode.Return or KeyCode.KeypadEnter){
+                HandleInput(input, handler);
                 upEvent.PreventDefault();
             }
-            if (upEvent.keyCode is KeyCode.Tab){
-                Tab();
+            if(upEvent.keyCode is KeyCode.Tab){
+                AutoComplete(input, handler);
                 upEvent.PreventDefault();
             }
         }
 
-        private static IConsoleHandler GetHandler(string input){
-            if (CachedHandler.Value != null && input.StartsWith(CachedHandler.Key)){
-                return CachedHandler.Value;
-            }
 
-            foreach(var handler in Handlers){
-                if(input.StartsWith(handler.Key)){
-                    CachedHandler = handler;
-                    return handler.Value;
-                }
-            }
+        private static void UpdateSyntaxHint(ReadOnlySpan<char> input, IConsoleHandler handler){
+            var syntax = handler.GetSyntax(handler.PassPrefix ? input : input[1..]);
+
+            SyntaxHintLabel.style.display = syntax.IsEmpty ? DisplayStyle.None : DisplayStyle.Flex;
+            SyntaxHintLabel.text = syntax.ToString();
+        }
+
+        private static void HandleInput(ReadOnlySpan<char> input, IConsoleHandler handler){
+            InputElement.value = string.Empty;
+            handler.Execute(handler.PassPrefix ? input : input[1..]);
+            FocusInput(0);
+        }
+
+        private static void AutoComplete(ReadOnlySpan<char> input, IConsoleHandler handler){
+            var completion = handler.GetAutoCompleted(handler.PassPrefix ? input : input[1..]);
             
-            CachedHandler = default;
+            if(completion.IsEmpty) return;
+            InputElement.value = completion.ToString();
+            if(!handler.PassPrefix) InputElement.value = input[0] + InputElement.value;
+            FocusInput();
+        }
+
+        private static IConsoleHandler GetHandler(ReadOnlySpan<char> input){
+            if(!input.IsEmpty && Handlers.TryGetValue(input[0], out var handler)) return handler;
+            
             return DefaultHandler;
         }
 
-        public static void RegisterHandler(char prefix, IConsoleHandler handler){            
-            if(Handlers.ContainsKey(prefix)){
-                throw new ArgumentException($"console handler prefix '{prefix}' already exists", nameof(prefix));
-            }
-            Handlers.Add(prefix, handler);
+        public static void Hide(InputAction.CallbackContext context = default){
+            ConsoleElement.style.visibility = Visibility.Hidden;
+            OnHide?.Invoke();
+        }
+        public static void Show(InputAction.CallbackContext context = default){
+            ConsoleElement.style.visibility = Visibility.Visible;
+            FocusInput();
+            UpdateView();
+            OnShow?.Invoke();
         }
 
-        public static void OverrideDefaultHandler(IConsoleHandler handler){
-            DefaultHandler = handler;
+        private static ReadOnlySpan<char> ReadInput(){
+            if(string.IsNullOrWhiteSpace(InputElement.value)) return ReadOnlySpan<char>.Empty;
+            return InputElement.value.AsSpan().Trim();
+        }
+        private static void UpdateView(){
+            MessageDisplayElement.text = string.Join("\n", Messages);
+        }
+        private static void FocusInput(int idx = -1){
+            // InputElement.Focus();
+            if(idx == -1) idx = InputElement.value.Length;
+            InputElement.SelectRange(idx, idx);
         }
 
         public static void AddMessage(string message){
             Messages.Add(message);
-            UpdateView();
+            if(IsVisible) UpdateView();
         }
         public static void AddWarningMessage(string message){
             AddMessage($"<color=yellow>{message}</color>");
@@ -140,25 +133,15 @@ namespace Ametrin.Console{
             AddMessage($"<color=#cc0000ff>{message}</color>");
         }
 
-        public static void Hide(InputAction.CallbackContext context = default){
-            Instance.HideInput.Disable();
-            ConsoleElement.style.visibility = Visibility.Hidden;
-            Instance.ShowInput.Enable();
-        }
-        public static void Show(InputAction.CallbackContext context = default){
-            Instance.ShowInput.Disable();
-            ConsoleElement.style.visibility = Visibility.Visible;
-            InputElement.Focus();
-            InputElement.SelectRange(InputElement.value.Length, InputElement.value.Length);
-            Instance.HideInput.Enable();
+        public static void RegisterHandler(char prefix, IConsoleHandler handler){
+            if(Handlers.ContainsKey(prefix)){
+                throw new ArgumentException($"console handler prefix '{prefix}' already exists", nameof(prefix));
+            }
+            Handlers.Add(prefix, handler);
         }
 
-        private static void UpdateView(){
-            MessageDisplayElement.text = string.Join("\n", Messages);
-        }
-
-        private void OnDisable(){
-            ShowInput.Disable();
+        public static void OverrideDefaultHandler(IConsoleHandler handler){
+            DefaultHandler = handler;
         }
     }
 
@@ -171,15 +154,15 @@ namespace Ametrin.Console{
             PassPrefix = passPrefix;
         }
 
-        public void Execute(string value){
-            OnExecute(value);
+        public void Execute(ReadOnlySpan<char> input){
+            OnExecute(input.ToString());
         }
     }
 
     public interface IConsoleHandler{
         public bool PassPrefix {get;}
-        public void Execute(string value); 
-        public string? GetSyntax(string value) => null;
-        public string? GetCompletion(string value) => null;
+        public void Execute(ReadOnlySpan<char> input); 
+        public ReadOnlySpan<char> GetSyntax(ReadOnlySpan<char> input) => ReadOnlySpan<char>.Empty;
+        public ReadOnlySpan<char> GetAutoCompleted(ReadOnlySpan<char> input) => ReadOnlySpan<char>.Empty;
     }
 }
