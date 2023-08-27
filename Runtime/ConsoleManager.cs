@@ -77,14 +77,14 @@ namespace Ametrin.Console{
         }
 
         private static void Tab(){
-            var input = InputElement.value;
+            var input = InputElement.value.TrimEnd();
             var handler = GetHandler(input);
             if (!handler.PassPrefix){
                 input = input.Remove(0, 1);
             }
             var completion = handler.GetCompletion(input);
             if(completion is null) return;
-            InputElement.value += completion;
+            InputElement.value = input + completion;
             InputElement.SelectRange(InputElement.value.Length, InputElement.value.Length);
         }
 
