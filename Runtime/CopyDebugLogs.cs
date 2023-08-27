@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Ametrin.Console{
     [RequireComponent(typeof(ConsoleManager))]
-    public class CopyDebugLogs : MonoBehaviour{
+    public sealed class CopyDebugLogs : MonoBehaviour{
         [SerializeField] private LogType LogLevel = LogType.Warning;
 
 
