@@ -83,8 +83,8 @@ namespace Ametrin.Console{
         private static void AutoComplete(ReadOnlySpan<char> input, IConsoleHandler handler){
             var completion = handler.GetAutoCompleted(handler.PassPrefix ? input : input[1..]);
             
-            if(completion.IsEmpty) return;
-            InputElement.value = completion.ToString();
+            if(string.IsNullOrWhiteSpace(completion)) return;
+            InputElement.value = completion;
             if(!handler.PassPrefix) InputElement.value = input[0] + InputElement.value;
             FocusInput();
         }
@@ -108,7 +108,7 @@ namespace Ametrin.Console{
 
         private static ReadOnlySpan<char> ReadInput(){
             if(string.IsNullOrWhiteSpace(InputElement.value)) return ReadOnlySpan<char>.Empty;
-            return InputElement.value.AsSpan().Trim();
+            return InputElement.value.AsSpan();
         }
         private static void UpdateView(){
             MessageDisplayElement.text = string.Join("\n", Messages);
@@ -163,6 +163,6 @@ namespace Ametrin.Console{
         public bool PassPrefix {get;}
         public void Execute(ReadOnlySpan<char> input); 
         public ReadOnlySpan<char> GetSyntax(ReadOnlySpan<char> input) => ReadOnlySpan<char>.Empty;
-        public ReadOnlySpan<char> GetAutoCompleted(ReadOnlySpan<char> input) => ReadOnlySpan<char>.Empty;
+        public string GetAutoCompleted(ReadOnlySpan<char> input) => string.Empty;
     }
 }
