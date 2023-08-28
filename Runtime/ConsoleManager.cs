@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.InputSystem;
+using Ametrin.Utils.Unity;
 
 namespace Ametrin.Console{
-    public sealed class ConsoleManager : MonoBehaviour{
+    public sealed class ConsoleManager : MonoBehaviourSingleton<ConsoleManager>{
         public static event Action OnShow;
         public static event Action OnHide;
         public static bool IsVisible => ConsoleElement.style.visibility.value == Visibility.Visible;
 
-        private static ConsoleManager Instance {get; set;}
         private static UIDocument Document;
         private static VisualElement ConsoleElement;
         private static TextField InputElement;
@@ -20,13 +20,8 @@ namespace Ametrin.Console{
         private readonly static Dictionary<char, IConsoleHandler> Handlers = new();
         private readonly static List<string> Messages = new();
         
-        private void Awake(){
-            if(Instance != null && Instance != this){
-                DestroyImmediate(gameObject);
-                return;
-            }
-
-            Instance = this;
+        protected override void Awake(){
+            base.Awake();
 
             Document = GetComponent<UIDocument>();
             ConsoleElement = Document.rootVisualElement;
