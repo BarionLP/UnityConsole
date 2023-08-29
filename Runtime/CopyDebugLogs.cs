@@ -31,12 +31,12 @@ namespace Ametrin.Console{
         }
 
         bool ShouldLog(LogType type){
-            return LogLevel switch{
+            return type switch{
                 LogType.Exception => true,
-                LogType.Error => type is LogType.Error or LogType.Exception,
-                LogType.Warning => type is not LogType.Log or LogType.Assert,
-                LogType.Log => type is not LogType.Assert,
-                LogType.Assert => type is LogType.Assert,
+                LogType.Error => LogLevel is LogType.Error or LogType.Exception,
+                LogType.Warning => LogLevel is not LogType.Log or LogType.Assert,
+                LogType.Log => LogLevel is not LogType.Assert,
+                LogType.Assert => LogLevel is LogType.Assert,
                 _ => false,
             };
         }
