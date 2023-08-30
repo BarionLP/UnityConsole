@@ -16,7 +16,7 @@ namespace Ametrin.Console{
         private static TextField InputElement;
         private static Label SyntaxHintLabel;
         private static Label MessageDisplayElement;
-        private static IConsoleHandler DefaultHandler = new ConsoleMessageHandler(AddMessage, true);
+        private static IConsoleHandler DefaultHandler = new ConsoleMessageHandler(AddMessage, false);
         private readonly static Dictionary<char, IConsoleHandler> Handlers = new();
         private readonly static List<string> Messages = new();
         
@@ -45,25 +45,36 @@ namespace Ametrin.Console{
                 return;
             }
             var handler = GetHandler(input);
+            if(!handler.PassPrefix && handler != DefaultHandler){
+                input = input[1..];
+            }
             UpdateSyntaxHint(input, handler);
         }
         private static void HandleKeys(KeyDownEvent upEvent){
             var input = ReadInput();
             if (input.IsEmpty) return;
             var handler = GetHandler(input);
-            if(upEvent.keyCode is KeyCode.Return or KeyCode.KeypadEnter){
+            char prefix;
+            if (handler.PassPrefix || handler == DefaultHandler){
+                prefix = '\0';
+            } else{
+                prefix = input[0];
+                input = input[1..];
+            }
+
+            if (upEvent.keyCode is KeyCode.Return or KeyCode.KeypadEnter){
                 HandleInput(input, handler);
                 upEvent.PreventDefault();
             }
             if(upEvent.keyCode is KeyCode.Tab){
-                AutoComplete(input, handler);
+                AutoComplete(input, handler, prefix);
                 upEvent.PreventDefault();
             }
         }
 
 
         private static void UpdateSyntaxHint(ReadOnlySpan<char> input, IConsoleHandler handler){
-            var syntax = handler.GetSyntax(handler.PassPrefix ? input : input[1..]);
+            var syntax = handler.GetSyntax(input);
 
             SyntaxHintLabel.style.display = syntax.IsEmpty ? DisplayStyle.None : DisplayStyle.Flex;
             SyntaxHintLabel.text = syntax.ToString();
@@ -71,16 +82,14 @@ namespace Ametrin.Console{
 
         private static void HandleInput(ReadOnlySpan<char> input, IConsoleHandler handler){
             InputElement.value = string.Empty;
-            handler.Execute(handler.PassPrefix ? input : input[1..]);
+            handler.Execute(input);
             FocusInput(0);
         }
 
-        private static void AutoComplete(ReadOnlySpan<char> input, IConsoleHandler handler){
-            var completion = handler.GetAutoCompleted(handler.PassPrefix ? input : input[1..]);
-            
+        private static void AutoComplete(ReadOnlySpan<char> input, IConsoleHandler handler, char prefix){
+            var completion = handler.GetAutoCompleted(input);
             if(string.IsNullOrWhiteSpace(completion)) return;
-            InputElement.value = completion;
-            if(!handler.PassPrefix) InputElement.value = input[0] + InputElement.value;
+            InputElement.value = prefix == '\0' ? completion : prefix + completion;
             FocusInput();
         }
 
