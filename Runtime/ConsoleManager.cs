@@ -25,7 +25,7 @@ namespace Ametrin.Console{
 
             Document = GetComponent<UIDocument>();
             ConsoleElement = Document.rootVisualElement;
-
+            
             InputElement = ConsoleElement.Query<TextField>();
             InputElement.RegisterValueChangedCallback(OnInputChanged);
             InputElement.RegisterCallback<KeyDownEvent>(HandleKeys);
@@ -65,13 +65,14 @@ namespace Ametrin.Console{
             if (upEvent.keyCode is KeyCode.Return or KeyCode.KeypadEnter){
                 HandleInput(input, handler);
                 upEvent.PreventDefault();
+                upEvent.StopPropagation();
             }
             if(upEvent.keyCode is KeyCode.Tab){
                 AutoComplete(input, handler, prefix);
                 upEvent.PreventDefault();
+                upEvent.StopPropagation();
             }
         }
-
 
         private static void UpdateSyntaxHint(ReadOnlySpan<char> input, IConsoleHandler handler){
             var syntax = handler.GetSyntax(input);
