@@ -2,14 +2,23 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityEngine.InputSystem;
-using Ametrin.Utils.Unity;
 
 namespace Ametrin.Console{
-    public sealed class ConsoleManager : MonoBehaviourSingleton<ConsoleManager>{
+    public sealed class ConsoleManager : MonoBehaviour{
         public static event Action OnShow;
         public static event Action OnHide;
         public static bool IsVisible => ConsoleElement.style.visibility.value == Visibility.Visible;
+        private static ConsoleManager _Instance;
+        public static ConsoleManager Instance{
+            get{
+                if (_Instance != null){
+                    if(FindAnyObjectByType<ConsoleManager>(FindObjectsInactive.Exclude) is not ConsoleManager instance) throw new Exception("No active Console found!");
+                    _Instance = instance;
+                }
+                
+                return _Instance;
+            }
+        }
 
         private static UIDocument Document;
         private static VisualElement ConsoleElement;
@@ -20,9 +29,12 @@ namespace Ametrin.Console{
         private readonly static Dictionary<char, IConsoleHandler> Handlers = new();
         private readonly static List<string> Messages = new();
         
-        protected override void Awake(){
-            base.Awake();
-
+        private void Awake(){
+            if (_Instance != null && _Instance != this){
+                Debug.LogError("Created duplicate console manager");
+                DestroyImmediate(gameObject);
+                return;
+            }
             Document = GetComponent<UIDocument>();
             ConsoleElement = Document.rootVisualElement;
             
@@ -48,7 +60,7 @@ namespace Ametrin.Console{
             if(!handler.PassPrefix && handler != DefaultHandler){
                 input = input[1..];
             }
-            UpdateSyntaxHint(input, handler);
+            UpdateHint(input, handler);
         }
         private static void HandleKeys(KeyDownEvent upEvent){
             var input = ReadInput();
@@ -74,23 +86,23 @@ namespace Ametrin.Console{
             }
         }
 
-        private static void UpdateSyntaxHint(ReadOnlySpan<char> input, IConsoleHandler handler){
-            var syntax = handler.GetSyntax(input);
+        private static void UpdateHint(ReadOnlySpan<char> input, IConsoleHandler handler){
+            var hint = handler.GetHint(input);
 
-            SyntaxHintLabel.style.display = syntax.IsEmpty ? DisplayStyle.None : DisplayStyle.Flex;
-            SyntaxHintLabel.text = syntax.ToString();
+            SyntaxHintLabel.style.display = string.IsNullOrWhiteSpace(hint) ? DisplayStyle.None : DisplayStyle.Flex;
+            SyntaxHintLabel.text = hint;
         }
 
         private static void HandleInput(ReadOnlySpan<char> input, IConsoleHandler handler){
             InputElement.value = string.Empty;
-            handler.Execute(input);
+            handler.Handle(input);
             FocusInput(0);
         }
 
         private static void AutoComplete(ReadOnlySpan<char> input, IConsoleHandler handler, char prefix){
             var completion = handler.GetAutoCompleted(input);
             if(string.IsNullOrWhiteSpace(completion)) return;
-            InputElement.value = prefix == '\0' ? completion : prefix + completion;
+            InputElement.value = prefix == '\0' || handler.PassPrefix ? completion : prefix + completion;
             FocusInput();
         }
 
@@ -100,11 +112,11 @@ namespace Ametrin.Console{
             return DefaultHandler;
         }
 
-        public static void Hide(InputAction.CallbackContext context = default){
+        public static void Hide(){
             ConsoleElement.style.visibility = Visibility.Hidden;
             OnHide?.Invoke();
         }
-        public static void Show(InputAction.CallbackContext context = default){
+        public static void Show(){
             ConsoleElement.style.visibility = Visibility.Visible;
             FocusInput();
             UpdateView();
@@ -138,6 +150,7 @@ namespace Ametrin.Console{
             AddMessage($"<color=#cc0000ff>{message}</color>");
         }
 
+        public static void RegisterHandler<T>(char prefix) where T : IConsoleHandler, new() => RegisterHandler(prefix, new T());
         public static void RegisterHandler(char prefix, IConsoleHandler handler){
             if(Handlers.ContainsKey(prefix)){
                 throw new ArgumentException($"console handler prefix '{prefix}' already exists", nameof(prefix));
@@ -159,15 +172,13 @@ namespace Ametrin.Console{
             PassPrefix = passPrefix;
         }
 
-        public void Execute(ReadOnlySpan<char> input){
-            OnExecute(input.ToString());
-        }
+        public void Handle(ReadOnlySpan<char> input) => OnExecute(input.ToString());
     }
 
     public interface IConsoleHandler{
         public bool PassPrefix {get;}
-        public void Execute(ReadOnlySpan<char> input); 
-        public ReadOnlySpan<char> GetSyntax(ReadOnlySpan<char> input) => ReadOnlySpan<char>.Empty;
+        public void Handle(ReadOnlySpan<char> input); 
+        public string GetHint(ReadOnlySpan<char> input) => string.Empty;
         public string GetAutoCompleted(ReadOnlySpan<char> input) => string.Empty;
     }
 }
