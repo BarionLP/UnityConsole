@@ -46,3 +46,7 @@ Scroller #unity-dragger {
     -unity-background-image-tint-color: rgb(255, 255, 255);
     background-color: rgba(255, 255, 255, 0.5);
 }
+
+.unity-text-field {
+    --unity-cursor-color:#FFFFFF;
+}
