@@ -25,29 +25,24 @@ namespace Ametrin.Console{
             Hide.canceled += HideConsole;
             ConsoleManager.OnShow += Hide.Enable;
             ConsoleManager.OnHide += Show.Enable;
-            if (ConsoleManager.IsVisible){
-                Hide.Enable();
-            }else{
-                Show.Enable();
-            }
         }
 
         private void OnDisable(){
-            Hide.Disable();
-            Show.Disable();
             Show.canceled -= ShowConsole;
             Hide.canceled -= HideConsole;
             ConsoleManager.OnShow -= Hide.Enable;
             ConsoleManager.OnHide -= Show.Enable;
+            Hide.Disable();
+            Show.Disable();
         }
 #else
         [SerializeField] private KeyCode Show;
         [SerializeField] private KeyCode Hide;
 
         private void Update(){
-            if(Input.GetKeyUp(Show)){
+            if(!ConsoleManager.IsVisible && Input.GetKeyUp(Show)){
                 ConsoleManager.Show();
-            }else if(Input.GetKeyUp(Hide)){
+            }else if(ConsoleManager.IsVisible && Input.GetKeyUp(Hide)){
                 ConsoleManager.Hide();
             }
         }

@@ -5,7 +5,6 @@ namespace Ametrin.Console{
     public sealed class CopyDebugLogs : MonoBehaviour{
         [SerializeField] private LogType LogLevel = LogType.Warning;
 
-
         private void OnEnable(){
             Application.logMessageReceived += OnUnityMessageLogged;
         }
@@ -17,6 +16,7 @@ namespace Ametrin.Console{
                 case LogType.Warning:
                     ConsoleManager.AddWarningMessage(message);
                     break;
+                case LogType.Assert:
                 case LogType.Error:
                     ConsoleManager.AddErrorMessage(message);
                     break;
@@ -33,10 +33,10 @@ namespace Ametrin.Console{
         bool ShouldLog(LogType type){
             return type switch{
                 LogType.Exception => true,
-                LogType.Error => LogLevel is LogType.Error or LogType.Exception,
-                LogType.Warning => LogLevel is not LogType.Log or LogType.Assert,
-                LogType.Log => LogLevel is not LogType.Assert,
-                LogType.Assert => LogLevel is LogType.Assert,
+                LogType.Error => LogLevel is not LogType.Exception,
+                LogType.Assert => LogLevel is not LogType.Exception and not LogType.Error,
+                LogType.Warning => LogLevel is LogType.Warning or LogType.Log,
+                LogType.Log => LogLevel is LogType.Log,
                 _ => false,
             };
         }
