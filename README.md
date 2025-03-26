@@ -4,7 +4,6 @@ A Unity Runtime Console using UI Toolkit
 ## Usage
 - requires Unity UI package (UI Toolkit)
 - new input system recommended
-- (optional) install [UpmGitExtension](https://github.com/mob-sakai/UpmGitExtension) package (https://github.com/mob-sakai/UpmGitExtension.git)
 - install Unity Console package https://github.com/BarionLP/UnityConsole.git 
 - add the ConsolePrefab to your scene
 
