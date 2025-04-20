@@ -3,31 +3,37 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-namespace Ametrin.Console{
+namespace Ametrin.Console
+{
     [RequireComponent(typeof(ConsoleManager))]
-    public sealed class ConsoleToggle : MonoBehaviour{
+    public sealed class ConsoleToggle : MonoBehaviour
+    {
 #if ENABLE_INPUT_SYSTEM
         [SerializeField] private InputAction Show;
         [SerializeField] private InputAction Hide;
 
-        private void ShowConsole(InputAction.CallbackContext context){
+        private void ShowConsole(InputAction.CallbackContext context)
+        {
             Show.Disable();
             ConsoleManager.Show();
         }
 
-        private void HideConsole(InputAction.CallbackContext context){
+        private void HideConsole(InputAction.CallbackContext context)
+        {
             Hide.Disable();
             ConsoleManager.Hide();
         }
 
-        private void OnEnable(){
+        private void OnEnable()
+        {
             Show.canceled += ShowConsole;
             Hide.canceled += HideConsole;
             ConsoleManager.OnShow += Hide.Enable;
             ConsoleManager.OnHide += Show.Enable;
         }
 
-        private void OnDisable(){
+        private void OnDisable()
+        {
             Show.canceled -= ShowConsole;
             Hide.canceled -= HideConsole;
             ConsoleManager.OnShow -= Hide.Enable;

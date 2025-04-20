@@ -1,18 +1,23 @@
 using UnityEngine;
 
-namespace Ametrin.Console{
+namespace Ametrin.Console
+{
     [RequireComponent(typeof(ConsoleManager))]
-    public sealed class CopyDebugLogs : MonoBehaviour{
+    public sealed class CopyDebugLogs : MonoBehaviour
+    {
         [SerializeField] private LogType LogLevel = LogType.Warning;
 
-        private void OnEnable(){
+        private void OnEnable()
+        {
             Application.logMessageReceived += OnUnityMessageLogged;
         }
 
-        private void OnUnityMessageLogged(string message, string stack, LogType logType){
+        private void OnUnityMessageLogged(string message, string stack, LogType logType)
+        {
             if (!ShouldLog(logType)) return;
 
-            switch (logType){
+            switch (logType)
+            {
                 case LogType.Warning:
                     ConsoleManager.AddWarningMessage(message);
                     break;
@@ -30,8 +35,10 @@ namespace Ametrin.Console{
             }
         }
 
-        bool ShouldLog(LogType type){
-            return type switch{
+        bool ShouldLog(LogType type)
+        {
+            return type switch
+            {
                 LogType.Exception => true,
                 LogType.Error => LogLevel is not LogType.Exception,
                 LogType.Assert => LogLevel is not LogType.Exception and not LogType.Error,
@@ -41,7 +48,8 @@ namespace Ametrin.Console{
             };
         }
 
-        private void OnDisable(){
+        private void OnDisable()
+        {
             Application.logMessageReceived -= OnUnityMessageLogged;
         }
     }
