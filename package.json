@@ -7,7 +7,7 @@
     "license": "MIT",
     "author": {
         "name": "Barion",
-        "email": "ametrin.studios@gmail.com",
+        "email": "barion+unity@ik.me",
         "url": "https://github.com/BarionLP"
     },
     "bugs": {
@@ -15,6 +15,6 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/BarionLP/UnityConsole.git"
+        "url": "https://github.com/BarionLP/UnityConsole"
     }
 }
