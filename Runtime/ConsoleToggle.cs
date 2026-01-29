@@ -45,10 +45,14 @@ namespace Ametrin.Console
         [SerializeField] private KeyCode Show;
         [SerializeField] private KeyCode Hide;
 
-        private void Update(){
-            if(!ConsoleManager.IsVisible && Input.GetKeyUp(Show)){
+        private void Update()
+        {
+            if(!ConsoleManager.IsVisible && Input.GetKeyUp(Show))
+            {
                 ConsoleManager.Show();
-            }else if(ConsoleManager.IsVisible && Input.GetKeyUp(Hide)){
+            }
+            else if(ConsoleManager.IsVisible && Input.GetKeyUp(Hide))
+            {
                 ConsoleManager.Hide();
             }
         }

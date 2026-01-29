@@ -5,6 +5,7 @@ using UnityEngine.UIElements;
 
 namespace Ametrin.Console
 {
+    [RequireComponent(typeof(UIDocument))]
     public sealed class ConsoleManager : MonoBehaviour
     {
         public static event Action OnShow;
