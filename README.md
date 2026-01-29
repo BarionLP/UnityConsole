@@ -46,7 +46,7 @@ public sealed class CustomHandler : IConsoleHandler
     public string GetHint(ReadOnlySpan<char> input)
     {
         // displays a hint above the text input, can be empty
-        // runs whenever the input changes, so be performace aware 
+        // runs whenever the input changes, so be performance aware 
     }
 
     // optional
