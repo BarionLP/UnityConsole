@@ -10,7 +10,7 @@ namespace Ametrin.Console
     {
         public static event Action OnShow;
         public static event Action OnHide;
-        public static bool IsVisible => _consoleElement.style.visibility.value == Visibility.Visible;
+        public static bool IsVisible => Instance._consoleElement.style.visibility.value is Visibility.Visible;
         private static ConsoleManager _Instance;
         public static ConsoleManager Instance
         {
@@ -18,7 +18,11 @@ namespace Ametrin.Console
             {
                 if (_Instance == null)
                 {
-                    if (FindAnyObjectByType<ConsoleManager>(FindObjectsInactive.Exclude) is not ConsoleManager instance) throw new Exception("No active Console found!");
+                    if (FindAnyObjectByType<ConsoleManager>(FindObjectsInactive.Exclude) is not ConsoleManager instance)
+                    {
+                        throw new Exception("No active Console found!");
+                    }
+
                     _Instance = instance;
                 }
 
@@ -26,25 +30,36 @@ namespace Ametrin.Console
             }
         }
 
-        private static UIDocument _document;
-        private static VisualElement _consoleElement;
-        private static TextField _inputElement;
-        private static Label _syntaxHintLabel;
-        private static Label _messageDisplayElement;
+        [Tooltip("Remove the Console when running outside of the editor")]
+        [SerializeField] private bool destroyInBuild;
+
+        // private  UIDocument _document;
+        private VisualElement _consoleElement;
+        private TextField _inputElement;
+        private Label _syntaxHintLabel;
+        private Label _messageDisplayElement;
         private static IConsoleHandler _defaultHandler = new ConsoleMessageHandler(AddMessage, false);
         private readonly static Dictionary<char, IConsoleHandler> _handlers = new();
         private readonly static List<string> _messages = new();
 
         private void Awake()
         {
+            #if !UNITY_EDITOR
+            if(destroyInBuild)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            #endif
+
             if (_Instance != null && _Instance != this)
             {
                 Debug.LogError("Created duplicate console manager");
-                DestroyImmediate(gameObject);
+                Destroy(gameObject);
                 return;
             }
-            _document = GetComponent<UIDocument>();
-            _consoleElement = _document.rootVisualElement;
+            var document = GetComponent<UIDocument>();
+            _consoleElement = document.rootVisualElement;
 
             _inputElement = _consoleElement.Query<TextField>();
             _inputElement.RegisterValueChangedCallback(OnInputChanged);
@@ -76,6 +91,7 @@ namespace Ametrin.Console
             }
             UpdateHint(input, handler);
         }
+
         private static void HandleKeys(KeyUpEvent upEvent)
         {
             var input = ReadInput();
@@ -108,13 +124,13 @@ namespace Ametrin.Console
         {
             var hint = handler.GetHint(input);
 
-            _syntaxHintLabel.style.display = string.IsNullOrWhiteSpace(hint) ? DisplayStyle.None : DisplayStyle.Flex;
-            _syntaxHintLabel.text = hint;
+            Instance._syntaxHintLabel.style.display = string.IsNullOrWhiteSpace(hint) ? DisplayStyle.None : DisplayStyle.Flex;
+            Instance._syntaxHintLabel.text = hint;
         }
 
         private static void HandleInput(ReadOnlySpan<char> input, IConsoleHandler handler)
         {
-            _inputElement.value = string.Empty;
+            Instance._inputElement.value = string.Empty;
             handler.Handle(input);
             ScheduleFocusInput(0);
         }
@@ -123,7 +139,7 @@ namespace Ametrin.Console
         {
             var completion = handler.GetAutoCompleted(input);
             if (string.IsNullOrWhiteSpace(completion)) return;
-            _inputElement.value = prefix == '\0' || handler.PassPrefix ? completion : prefix + completion;
+            Instance._inputElement.value = prefix == '\0' || handler.PassPrefix ? completion : prefix + completion;
             ScheduleFocusInput();
         }
 
@@ -136,52 +152,46 @@ namespace Ametrin.Console
 
         public static void Hide()
         {
-            _consoleElement.style.display = DisplayStyle.None;
+            Instance._consoleElement.style.display = DisplayStyle.None;
             OnHide?.Invoke();
         }
+
         public static void Show()
         {
             UpdateView();
-            _consoleElement.style.display = DisplayStyle.Flex;
+            Instance._consoleElement.style.display = DisplayStyle.Flex;
             ScheduleFocusInput();
             OnShow?.Invoke();
         }
 
         private static ReadOnlySpan<char> ReadInput()
         {
-            if (string.IsNullOrWhiteSpace(_inputElement.value)) return ReadOnlySpan<char>.Empty;
-            return _inputElement.value.AsSpan();
+            if (string.IsNullOrWhiteSpace(Instance._inputElement.value)) return ReadOnlySpan<char>.Empty;
+            return Instance._inputElement.value.AsSpan();
         }
         private static void UpdateView()
         {
-            _messageDisplayElement.text = string.Join("\n", _messages);
+            Instance._messageDisplayElement.text = string.Join("\n", _messages);
         }
 
         private static void ScheduleFocusInput(int idx = -1)
         {
-            Instance.StartCoroutine(Impl());
-            if (idx == -1) idx = _inputElement.value.Length;
-            _inputElement.SelectRange(idx, idx);
+            _ = Impl();
+            if (idx is -1) idx = Instance._inputElement.value.Length;
+            Instance._inputElement.SelectRange(idx, idx);
 
-#if UNITY_2023_1_OR_NEWER
             static async Awaitable Impl()
             {
                 try
                 {
                     await Awaitable.EndOfFrameAsync();
-                    _inputElement.Focus();
+                    Instance._inputElement.Focus();
                 }
                 catch (Exception e)
                 {
                     Debug.LogException(e);
                 }
             }
-#else
-            static async IEnumerator Impl(){
-                yield return new WaitForEndOfFrame();
-                _inputElement.Focus();
-            }
-#endif
         }
 
         public static void Clear()

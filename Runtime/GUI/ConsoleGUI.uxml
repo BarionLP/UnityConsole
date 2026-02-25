@@ -2,9 +2,9 @@
     <Style src="project://database/Assets/Console/Runtime/GUI/ConsoleDefaultStyle.uss?fileID=7433441132597879392&amp;guid=97ea13362e0f4d844b5c20dbc8e1434b&amp;type=3#ConsoleDefaultStyle" />
     <ui:VisualElement name="console" style="position: absolute; bottom: 0; top: auto; left: 0; right: 0;">
         <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" class="ametrin-console-background" style="max-height: 540px;">
-            <ui:Label name="output" selectable="true" select-word-by-double-click="true" select-line-by-triple-click="true" class="ametrin-console-text" style="text-overflow: ellipsis;" />
+            <ui:Label name="output" selectable="true" double-click-selects-word="true" triple-click-selects-line="true" class="ametrin-console-text" style="text-overflow: ellipsis;" />
         </ui:ScrollView>
         <ui:Label name="syntax" class="ametrin-console-background ametrin-console-suggestion" />
-        <ui:TextField placeholder-text=". . ." picking-mode="Ignore" name="input" class="ametrin-console-text ametrin-console-background" style="border-top-left-radius: 15px; border-bottom-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; align-self: auto;" />
+        <ui:TextField placeholder-text=". . ." name="input" class="ametrin-console-text ametrin-console-background" style="border-top-left-radius: 15px; border-bottom-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; align-self: auto;" />
     </ui:VisualElement>
 </ui:UXML>
