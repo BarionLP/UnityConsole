@@ -58,5 +58,5 @@ public sealed class CustomHandler : IConsoleHandler
 }
 ```
 
-## Tipps
+## Recommendation
 If you want to run commands from this console consider using https://github.com/BarionLP/CommandSystem with https://github.com/BarionLP/UnityConsoleCommandIntegration
